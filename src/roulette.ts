@@ -60,6 +60,10 @@ export class Roulette extends EventTarget {
     return this._isReady;
   }
 
+  get canvas(): HTMLCanvasElement {
+    return this._renderer.canvas;
+  }
+
   protected createRenderer(): RouletteRenderer {
     return new RouletteRenderer();
   }
@@ -320,7 +324,7 @@ export class Roulette extends EventTarget {
 
   public clearMarbles() {
     this.physics.clearMarbles();
-    this._winner = null;
+    // Winner overlay는 다음 Start 전까지 유지
     this._winners = [];
     this._marbles = [];
   }
@@ -335,6 +339,8 @@ export class Roulette extends EventTarget {
   }
 
   public start() {
+    this._winner = null;
+    this._winners = [];
     this._isRunning = true;
     this._winnerRank = options.winningRank;
     if (this._winnerRank >= this._marbles.length) {
@@ -489,10 +495,21 @@ export class Roulette extends EventTarget {
 
   public getCurrentMap() {
     if (!this._stage) return null;
+    const index = stages.indexOf(this._stage);
     return {
-      index: stages.indexOf(this._stage),
+      index,
       title: this._stage.title,
+      custom: index < 0,
     };
+  }
+
+  public getStage(): StageDef | null {
+    return this._stage;
+  }
+
+  public cloneStage(): StageDef | null {
+    if (!this._stage) return null;
+    return JSON.parse(JSON.stringify(this._stage)) as StageDef;
   }
 
   public setMap(index: number) {
@@ -503,5 +520,39 @@ export class Roulette extends EventTarget {
     this._stage = stages[index];
     this.setMarbles(names);
     this._camera.initializePosition();
+  }
+
+  public setCustomMap(stage: StageDef) {
+    const names = this._marbles.map((marble) => marble.name);
+    this._stage = JSON.parse(JSON.stringify(stage)) as StageDef;
+    this.setMarbles(names);
+    this._camera.initializePosition();
+  }
+
+  /** Convert a canvas CSS click into world coordinates. */
+  public screenToWorld(offsetX: number, offsetY: number): { x: number; y: number } {
+    const sizeFactor = this._renderer.sizeFactor;
+    const sx = offsetX * sizeFactor;
+    const sy = offsetY * sizeFactor;
+    const w = this._renderer.width;
+    const h = this._renderer.height;
+    const zoom = this._camera.zoom;
+    const scale = initialZoom * zoom;
+    return {
+      x: this._camera.x + (sx - w / 2) / scale,
+      y: this._camera.y + (sy - h / 2) / scale,
+    };
+  }
+
+  public getCameraView() {
+    return {
+      x: this._camera.x,
+      y: this._camera.y,
+      zoom: this._camera.zoom,
+    };
+  }
+
+  public lockCamera(locked: boolean) {
+    this._camera.lock(locked);
   }
 }

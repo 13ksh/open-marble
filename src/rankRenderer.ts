@@ -72,12 +72,11 @@ export class RankRenderer implements UIObject {
     ctx.textAlign = 'right';
     ctx.font = '10pt sans-serif';
     ctx.fillStyle = '#666';
-    ctx.fillText(`${winners.length} / ${winners.length + marbles.length}`, width - 5, this.fontHeight);
+    ctx.fillText(`${winners.length} / ${winners.length + marbles.length}`, startX, this.fontHeight);
 
     ctx.beginPath();
     ctx.rect(width - 150, this.fontHeight + 2, width, this.maxY);
     ctx.clip();
-
     ctx.translate(0, -startY);
     ctx.font = 'bold 11pt sans-serif';
     if (theme.rankStroke) {
@@ -88,8 +87,16 @@ export class RankRenderer implements UIObject {
       const y = rank * this.fontHeight;
       if (y >= startY && y <= startY + ctx.canvas.height) {
         ctx.fillStyle = `hsl(${marble.hue} 100% ${theme.marbleLightness}`;
-        ctx.strokeText(`${rank === winnerRank ? '☆' : '\u2714'} ${marble.name} #${rank + 1}`, startX, 20 + y);
-        ctx.fillText(`${rank === winnerRank ? '☆' : '\u2714'} ${marble.name} #${rank + 1}`, startX, 20 + y);
+        ctx.strokeText(
+          `${rank === winnerRank ? '☆' : '\u2714'} ${marble.name} #${rank + 1}`,
+          startX,
+          20 + y
+        );
+        ctx.fillText(
+          `${rank === winnerRank ? '☆' : '\u2714'} ${marble.name} #${rank + 1}`,
+          startX,
+          20 + y
+        );
       }
     });
     ctx.font = '10pt sans-serif';

@@ -4,16 +4,20 @@ import type { ColorTheme } from './types/ColorTheme';
 import type { MapEntityState } from './types/MapEntity.type';
 import type { Rect } from './types/rect.type';
 import type { VectorLike } from './types/VectorLike';
-import type { UIObject } from './UIObject';
+import type { MouseEventArgs, UIObject } from './UIObject';
 import { bound } from './utils/bound.decorator';
 
+/**
+ * Original minimap layout (top-left, always visible).
+ * Camera only locks to minimap position while the pointer is held down.
+ */
 export class Minimap implements UIObject {
   private ctx!: CanvasRenderingContext2D;
   private lastParams: RenderParameters | null = null;
 
   private _onViewportChangeHandler: ((pos?: VectorLike) => void) | null = null;
   private boundingBox: Rect;
-  private mousePosition: { x: number; y: number } | null = null;
+  private _holding = false;
 
   constructor() {
     this.boundingBox = {
@@ -37,28 +41,37 @@ export class Minimap implements UIObject {
   }
 
   @bound
-  onMouseMove(e?: { x: number; y: number }) {
-    if (!e) {
-      this.mousePosition = null;
-      if (this._onViewportChangeHandler) {
-        this._onViewportChangeHandler();
-      }
-      return;
-    }
-    if (!this.lastParams) return;
-    this.mousePosition = {
-      x: e.x,
-      y: e.y,
-    };
-    if (this._onViewportChangeHandler) {
-      this._onViewportChangeHandler({
-        x: this.mousePosition.x / 4,
-        y: this.mousePosition.y / 4,
-      });
-    }
+  onMouseDown(e?: MouseEventArgs) {
+    if (!e || !this.lastParams) return;
+    this._holding = true;
+    this._emit(e.x, e.y);
   }
 
-  render(ctx: CanvasRenderingContext2D, params: RenderParameters) {
+  @bound
+  onMouseUp(_e?: MouseEventArgs) {
+    if (!this._holding) return;
+    this._holding = false;
+    this._onViewportChangeHandler?.();
+  }
+
+  @bound
+  onMouseMove(e?: MouseEventArgs) {
+    if (!this._holding) return;
+    if (!e || !this.lastParams) {
+      // pointer left the box while holding — keep last lock until mouseup on window
+      return;
+    }
+    this._emit(e.x, e.y);
+  }
+
+  private _emit(x: number, y: number) {
+    this._onViewportChangeHandler?.({
+      x: x / 4,
+      y: y / 4,
+    });
+  }
+
+  render(ctx: CanvasRenderingContext2D, params: RenderParameters, _width?: number, _height?: number) {
     if (!ctx) return;
     const { stage } = params;
     if (!stage) return;

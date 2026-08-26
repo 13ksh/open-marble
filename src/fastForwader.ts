@@ -47,7 +47,7 @@ export class FastForwader implements UIObject {
   }
 
   onMouseDown?(_e?: MouseEventArgs): void {
-    this.isEnabled = true;
+    // Open Marble: 맵 클릭으로 부스트(빨리감기) 하지 않음
   }
 
   onMouseUp?(_e?: MouseEventArgs): void {

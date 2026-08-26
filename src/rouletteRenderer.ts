@@ -359,15 +359,14 @@ export class RouletteRenderer {
     this.ctx.save();
     this.ctx.fillStyle = theme.winnerBackground;
     this.ctx.fillRect(
-      this._sceneCanvas.width / 2,
+      0,
       this._sceneCanvas.height - winnerAreaHeight,
       this._sceneCanvas.width / 2,
       winnerAreaHeight
     );
 
-    // Draw marble image or colored circle
     const marbleSize = 100;
-    const marbleCenterX = this._sceneCanvas.width - marbleSize / 2 - 20;
+    const marbleCenterX = marbleSize / 2 + 20;
     const marbleCenterY = this._sceneCanvas.height - winnerAreaHeight / 2;
     const marbleImage = this.getMarbleImage(winner.name);
 
@@ -390,20 +389,20 @@ export class RouletteRenderer {
     this.ctx.strokeStyle = theme.winnerOutline;
 
     this.ctx.font = 'bold 48px sans-serif';
-    this.ctx.textAlign = 'right';
+    this.ctx.textAlign = 'left';
     this.ctx.lineWidth = 4;
-    const textRightX = marbleCenterX - marbleSize / 2 - 20;
+    const textLeftX = marbleCenterX + marbleSize / 2 + 20;
     if (theme.winnerOutline) {
-      this.ctx.strokeText('Winner', textRightX, this._sceneCanvas.height - 120 + WINNER_TEXT_OFFSET);
+      this.ctx.strokeText('Winner', textLeftX, this._sceneCanvas.height - 120 + WINNER_TEXT_OFFSET);
     }
 
-    this.ctx.fillText('Winner', textRightX, this._sceneCanvas.height - 120 + WINNER_TEXT_OFFSET);
+    this.ctx.fillText('Winner', textLeftX, this._sceneCanvas.height - 120 + WINNER_TEXT_OFFSET);
     this.ctx.font = 'bold 72px sans-serif';
     this.ctx.fillStyle = `hsl(${winner.hue} 100% ${theme.marbleLightness})`;
     if (theme.winnerOutline) {
-      this.ctx.strokeText(winner.name, textRightX, this._sceneCanvas.height - 55 + WINNER_TEXT_OFFSET);
+      this.ctx.strokeText(winner.name, textLeftX, this._sceneCanvas.height - 55 + WINNER_TEXT_OFFSET);
     }
-    this.ctx.fillText(winner.name, textRightX, this._sceneCanvas.height - 55 + WINNER_TEXT_OFFSET);
+    this.ctx.fillText(winner.name, textLeftX, this._sceneCanvas.height - 55 + WINNER_TEXT_OFFSET);
     this.ctx.restore();
   }
 }
