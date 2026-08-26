@@ -255,7 +255,8 @@ div.copyright a {
       &.row-toggles,
       &.winner-row,
       &.start-row,
-      &.colors-row {
+      &.colors-row,
+      &.theme-save-row {
         height: auto;
         min-height: 35px;
         padding: 4px 0;
@@ -1010,6 +1011,12 @@ button.danger {
   margin-top: 6px;
 }
 
+.theme-save-row .save-row {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin-top: 0;
+}
+
 .save-row input[type="text"] {
   flex: 1;
   min-width: 120px;
@@ -1057,7 +1064,8 @@ button.danger {
     max-width: none;
   }
 
-  #settings div.right div.row.colors-row {
+  #settings div.right div.row.colors-row,
+  #settings div.right div.row.theme-save-row {
     display: block !important;
   }
 

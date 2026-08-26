@@ -321,19 +321,27 @@ function bindSettingsPresetControls(roulette: Roulette, options: Options) {
     }
   });
 
-  $('#btnAddSettingsPreset')?.addEventListener('click', () => {
+  const addSettingsPreset = () => {
     const titleInput = $('#in_settingsPresetName') as HTMLInputElement;
     const title = titleInput?.value.trim();
     if (!title) {
-      toast('설정 프리셋 이름을 입력하세요');
+      toast('테마 이름을 입력하세요');
       titleInput?.focus();
       return;
     }
     const preset: SettingsPreset = { id: uid(), title, ...currentSettingsSnapshot(options) };
     settingsPresets.upsert(preset);
     fillSettingsSelector(preset.id);
+    session.setActiveSettingsId(preset.id);
     if (titleInput) titleInput.value = '';
-    toast(`설정 저장됨: ${title}`);
+    toast(`테마 저장됨: ${title}`);
+  };
+  $('#btnAddSettingsPreset')?.addEventListener('click', addSettingsPreset);
+  $('#in_settingsPresetName')?.addEventListener('keydown', (e) => {
+    if ((e as KeyboardEvent).key === 'Enter') {
+      e.preventDefault();
+      addSettingsPreset();
+    }
   });
 
   const delSettingsBtn = $('#btnDeleteSettingsPreset');
