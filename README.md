@@ -6,11 +6,11 @@
 
 # Open Marble
 
-광고 없는 [lazygyu/roulette](https://github.com/lazygyu/roulette) (Marble Roulette) **MIT 포크**.
+광고 없는 [lazygyu/roulette](https://github.com/lazygyu/roulette/pull/67) (Marble Roulette) **MIT 포크**.
 
 ## 왜 합법인가 (MIT)
 
-원본 저장소 [lazygyu/roulette](https://github.com/lazygyu/roulette)는 **MIT License**입니다. MIT는 다음을 **명시적으로 허용**합니다.
+원본 저장소 [lazygyu/roulette](https://github.com/lazygyu/roulette/pull/67)는 **MIT License**입니다. MIT는 다음을 **명시적으로 허용**합니다.
 
 - 소스 코드를 **복제·수정·재배포**하는 것
 - 상업적·비상업적 사용
@@ -31,7 +31,7 @@
 
 | 항목 | 내용 |
 |------|------|
-| 원본 저장소 | https://github.com/lazygyu/roulette |
+| 원본 저장소 | https://github.com/lazygyu/roulette/pull/67 |
 | 박제 브랜치 | `upstream-original` — 포크 직후 수정 없는 원본 트리 |
 | 원격 (upstream) | `https://github.com/lazygyu/roulette.git` |
 | 라이선스 | MIT — Copyright (c) 2023 LazyGyu |
