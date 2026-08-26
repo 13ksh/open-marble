@@ -1,3 +1,7 @@
+# 요약
+
+쓰던 사이트가 뭔가 유료 상품을 추가하는 건 이해 했는데 광고 넣어서 화난 중학생이 만든 사이트 포크 ☠️🤫😂✨
+
 # Open Marble
 
 광고 없는 [lazygyu/roulette](https://github.com/lazygyu/roulette) (Marble Roulette) **MIT 포크**.
@@ -29,6 +33,7 @@
 | 박제 브랜치 | `upstream-original` — 포크 직후 수정 없는 원본 트리 |
 | 원격 (upstream) | `https://github.com/lazygyu/roulette.git` |
 | 라이선스 | MIT — Copyright (c) 2023 LazyGyu |
+| 내 저장소에 있는 원본 내용.zip | https://github.com/13ksh/open-marble/blob/open-marble/roulette-main(github-lazygyu-roulette-pull-67)%20%EB%B0%B1%EC%97%85%EB%B3%B8.zip |
 
 원본만 보고 싶을 때:
 
@@ -72,4 +77,9 @@ npm run build
 MIT — see [LICENSE](./LICENSE).
 
 - Original work Copyright (c) 2023 LazyGyu  
-- Modifications Copyright (c) 2026 Open Marble contributors  
+- Modifications Copyright (c) 2026 Open Marble contributors
+
+# 그리고 마지막 
+
+MIT 라이선스 해주신 lazygyu 감사 감사 ✨✨✨
+그리고 이 프로젝트는 [제 cursor](https://cursor.com/@34444) (광고 아님 내가 커서 같은 대기업과 광고 할 수 있었으면 지금 쯤 여기가 아니라 호캉스에 있었겠지😭😭😭) 과 4시간 만에 만들었습니다. ♥️♥️♥️♥️♥️♥️♥️
