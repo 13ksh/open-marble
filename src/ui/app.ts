@@ -47,10 +47,42 @@ function $(sel: string): HTMLElement | null {
   return document.querySelector(sel);
 }
 
+/** 1~4 또는 1～4 → ["1","2","3","4"] (접미사 *2 /3 유지) */
+function expandNumberRangeToken(token: string): string[] {
+  const m = /^(\d+)\s*[~～\-]\s*(\d+)(.*)$/.exec(token.trim());
+  if (!m) return [token];
+  let a = parseInt(m[1], 10);
+  let b = parseInt(m[2], 10);
+  const suffix = m[3] ?? '';
+  if (!Number.isFinite(a) || !Number.isFinite(b)) return [token];
+  if (a > b) [a, b] = [b, a];
+  if (b - a > 500) return [token];
+  const out: string[] = [];
+  for (let i = a; i <= b; i++) out.push(`${i}${suffix}`);
+  return out;
+}
+
+/** 예전에 잘못 저장된 "1,2,3,...,25" → "1~25" */
+function collapseExpandedNumberList(raw: string): string | null {
+  const parts = raw.split(/[,\r\n]/g).map((v) => v.trim()).filter((v) => !!v);
+  if (parts.length < 2) return null;
+  const nums: number[] = [];
+  for (const p of parts) {
+    if (!/^\d+$/.test(p)) return null;
+    nums.push(parseInt(p, 10));
+  }
+  for (let i = 1; i < nums.length; i++) {
+    if (nums[i] !== nums[0] + i) return null;
+  }
+  return `${nums[0]}~${nums[nums.length - 1]}`;
+}
+
 function getNames(): string[] {
   const area = $('#in_names') as HTMLTextAreaElement | null;
   if (!area) return [];
-  return area.value.trim().split(/[,\r\n]/g).map((v) => v.trim()).filter((v) => !!v);
+  const raw = area.value.trim().split(/[,\r\n]/g).map((v) => v.trim()).filter((v) => !!v);
+  // 화면에는 1~4 유지, 구슬 배치만 1,2,3,4 로 펼침
+  return raw.flatMap(expandNumberRangeToken);
 }
 
 function parseName(nameStr: string) {
@@ -75,10 +107,12 @@ function setWinnerRank(roulette: Roulette, options: Options, rank: number) {
 }
 
 function getReady(roulette: Roulette) {
+  const area = $('#in_names') as HTMLTextAreaElement | null;
   const names = getNames();
   roulette.setMarbles(names);
   ready = names.length > 0;
-  session.setLastNames(names.join(','));
+  // 저장은 입력란 원문 유지 (1~25 유지, 펼친 1,2,3… 으로 덮지 않음)
+  if (area) session.setLastNames(area.value);
   if (winnerType === 'first') setWinnerRank(roulette, (window as any).options, 1);
   else if (winnerType === 'last') setWinnerRank(roulette, (window as any).options, Math.max(1, roulette.getCount()));
 }
@@ -86,10 +120,21 @@ function getReady(roulette: Roulette) {
 function normalizeNamesField(roulette: Roulette) {
   const area = $('#in_names') as HTMLTextAreaElement | null;
   if (!area) return;
-  const nameSource = getNames();
+  // 입력란의 1~4 표기는 유지. 중복 합치기만 하고 범위는 펼치지 않음.
+  const tokens = area.value.trim().split(/[,\r\n]/g).map((v) => v.trim()).filter((v) => !!v);
   const nameSet = new Set<string>();
   const nameCounts: Record<string, number> = {};
-  nameSource.forEach((nameSrc) => {
+  tokens.forEach((nameSrc) => {
+    // 범위 토큰(1~4)은 그대로 한 칸으로 유지
+    if (/^\d+\s*[~～\-]\s*\d+/.test(nameSrc)) {
+      const key = nameSrc.replace(/\s+/g, '');
+      if (!nameSet.has(key)) {
+        nameSet.add(key);
+        nameCounts[key] = 0;
+      }
+      nameCounts[key] += 1;
+      return;
+    }
     const name = parseName(nameSrc);
     const key = name.weight > 1 ? `${name.name}/${name.weight}` : name.name;
     if (!nameSet.has(key)) {
@@ -100,13 +145,17 @@ function normalizeNamesField(roulette: Roulette) {
   });
   const result: string[] = [];
   Object.keys(nameCounts).forEach((key) => {
-    result.push(nameCounts[key] > 1 ? `${key}*${nameCounts[key]}` : key);
+    if (/^\d+[~～\-]\d+/.test(key)) {
+      result.push(nameCounts[key] > 1 ? `${key}*${nameCounts[key]}` : key);
+    } else {
+      result.push(nameCounts[key] > 1 ? `${key}*${nameCounts[key]}` : key);
+    }
   });
   const newValue = result.join(',');
   if (area.value !== newValue) {
     area.value = newValue;
-    getReady(roulette);
   }
+  getReady(roulette);
 }
 
 function toast(msg: string) {
@@ -190,17 +239,11 @@ function currentSettingsSnapshot(options: Options): Omit<SettingsPreset, 'id' | 
 
 function applySettings(roulette: Roulette, options: Options, preset: SettingsPreset) {
   winnerType = preset.winnerType;
-  const skillEl = $('#chkSkill') as HTMLInputElement | null;
-  const recEl = $('#chkAutoRecording') as HTMLInputElement | null;
-  if (skillEl) skillEl.checked = preset.useSkills;
-  if (recEl) recEl.checked = preset.autoRecording;
+  // 녹화·스킬은 프리셋과 무관 — 사용자가 직접 켠 값 유지
   options.darkMode = preset.darkMode;
-  options.useSkills = preset.useSkills;
-  options.autoRecording = preset.autoRecording;
   document.documentElement.classList.toggle('light', !preset.darkMode);
   writeColorsToUI(preset.colors);
   applyColorsToTheme(roulette, preset.darkMode, preset.colors);
-  roulette.setAutoRecording(preset.autoRecording);
   if (preset.winnerType === 'last') {
     setWinnerRank(roulette, options, Math.max(1, roulette.getCount() || 1));
   } else if (preset.winnerType === 'first') {
@@ -334,7 +377,7 @@ function restoreActiveSettings(roulette: Roulette, options: Options) {
   const settingsList = settingsPresets.list();
   const active =
     settingsList.find((p) => p.id === activeSettingsId) ??
-    settingsList.find((p) => p.id === 'builtin-last-winner') ??
+    settingsList.find((p) => p.id === 'builtin-dark') ??
     settingsList[0];
   if (active) applySettings(roulette, options, active);
 }
@@ -405,7 +448,14 @@ function initMain(roulette: Roulette, options: Options) {
   if (urlNames) namesArea.value = urlNames.replace(/,/g, '\n');
   else {
     const saved = session.getLastNames();
-    if (saved) namesArea.value = saved;
+    if (saved) {
+      const collapsed = collapseExpandedNumberList(saved);
+      if (saved === '수박*2,키위*2,귤*2') namesArea.value = '1~25';
+      else if (collapsed) namesArea.value = collapsed;
+      else namesArea.value = saved;
+    } else {
+      namesArea.value = '1~25';
+    }
   }
 
   namesArea.addEventListener('input', () => getReady(roulette));
@@ -441,12 +491,9 @@ function initMain(roulette: Roulette, options: Options) {
 
   roulette.addEventListener('goal', () => {
     ready = false;
-    // Winner 동안 설정 섬은 숨김. 구슬만 다시 섞어 두고, 아무 입력까지 대기.
-    setTimeout(() => {
-      getReady(roulette);
-    }, 3000);
-
+    // Winner 유지. 조작 창을 다시 열 때(클릭/키) 구슬 초기화.
     const revealSettings = () => {
+      getReady(roulette);
       $('#settings')?.classList.remove('hide');
       window.removeEventListener('pointerdown', revealSettings, true);
       window.removeEventListener('keydown', revealSettings, true);

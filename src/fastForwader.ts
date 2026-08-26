@@ -1,56 +1,42 @@
 import type { RenderParameters } from './rouletteRenderer';
 import type { Rect } from './types/rect.type';
-import type { MouseEventArgs, UIObject } from './UIObject';
+import type { UIObject } from './UIObject';
 
+/** 진행 중 + 미니맵 밖 누르고 있을 때 배속 (입력은 Roulette에서 처리) */
 export class FastForwader implements UIObject {
-  private bound: Rect = {
-    x: 0,
-    y: 0,
-    w: 0,
-    h: 0,
-  };
   private icon: HTMLImageElement;
+  private holding = false;
+  private running = false;
 
   constructor() {
     this.icon = new Image();
     this.icon.src = new URL('../assets/images/ff.svg', import.meta.url).toString();
   }
 
-  private isEnabled: boolean = false;
-
   public get speed(): number {
-    return this.isEnabled ? 2 : 1;
+    return this.running && this.holding ? 3 : 1;
+  }
+
+  public setRunning(running: boolean) {
+    this.running = running;
+    if (!running) this.holding = false;
+  }
+
+  public setHolding(holding: boolean) {
+    this.holding = this.running && holding;
   }
 
   update(_deltaTime: number): void {}
 
   render(ctx: CanvasRenderingContext2D, _params: RenderParameters, width: number, height: number): void {
-    this.bound.w = width / 2;
-    this.bound.h = height / 2;
-    this.bound.x = this.bound.w / 2;
-    this.bound.y = this.bound.h / 2;
-
-    const centerX = this.bound.x + this.bound.w / 2;
-    const centerY = this.bound.y + this.bound.h / 2;
-
-    if (this.isEnabled) {
-      ctx.save();
-      ctx.strokeStyle = 'white';
-      ctx.globalAlpha = 0.5;
-      ctx.drawImage(this.icon, centerX - 100, centerY - 100, 200, 200);
-      ctx.restore();
-    }
+    if (!this.running || !this.holding) return;
+    ctx.save();
+    ctx.globalAlpha = 0.5;
+    ctx.drawImage(this.icon, width / 2 - 100, height / 2 - 100, 200, 200);
+    ctx.restore();
   }
 
   getBoundingBox(): Rect | null {
-    return this.bound;
-  }
-
-  onMouseDown?(_e?: MouseEventArgs): void {
-    // Open Marble: 맵 클릭으로 부스트(빨리감기) 하지 않음
-  }
-
-  onMouseUp?(_e?: MouseEventArgs): void {
-    this.isEnabled = false;
+    return null;
   }
 }

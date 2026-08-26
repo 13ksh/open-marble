@@ -54,6 +54,7 @@ export class Roulette extends EventTarget {
 
   private _isReady: boolean = false;
   protected fastForwarder!: FastForwader;
+  private minimap!: Minimap;
   protected _theme: ColorTheme = Themes.dark;
 
   get isReady() {
@@ -155,6 +156,7 @@ export class Roulette extends EventTarget {
           this.dispatchEvent(new CustomEvent('goal', { detail: { winner: marble.name } }));
           this._winner = marble;
           this._isRunning = false;
+          this.fastForwarder.setRunning(false);
           this._particleManager.shot(this._renderer.width, this._renderer.height);
           setTimeout(() => {
             this._recorder.stop();
@@ -171,6 +173,7 @@ export class Roulette extends EventTarget {
           );
           this._winner = this._marbles[i + 1];
           this._isRunning = false;
+          this.fastForwarder.setRunning(false);
           this._particleManager.shot(this._renderer.width, this._renderer.height);
           setTimeout(() => {
             this._recorder.stop();
@@ -234,9 +237,8 @@ export class Roulette extends EventTarget {
     await this.physics.init();
 
     this.addUiObject(new RankRenderer());
-    this.attachEvent();
-    const minimap = new Minimap();
-    minimap.onViewportChange((pos) => {
+    this.minimap = new Minimap();
+    this.minimap.onViewportChange((pos) => {
       if (pos) {
         this._camera.setPosition(pos, false);
         this._camera.lock(true);
@@ -244,11 +246,28 @@ export class Roulette extends EventTarget {
         this._camera.lock(false);
       }
     });
-    this.addUiObject(minimap);
+    this.addUiObject(this.minimap);
     this.fastForwarder = this.createFastForwader();
     this.addUiObject(this.fastForwarder);
+    this.attachEvent();
     this._stage = stages[0];
     this._loadMap();
+  }
+
+  private isPosInMinimap(x: number, y: number): boolean {
+    const bounds = this.minimap?.getBoundingBox();
+    if (!bounds || bounds.w <= 0 || bounds.h <= 0) return false;
+    return x >= bounds.x && y >= bounds.y && x <= bounds.x + bounds.w && y <= bounds.y + bounds.h;
+  }
+
+  private canvasPosFromEvent(e: MouseEvent | PointerEvent) {
+    const canvas = this._renderer.canvas;
+    const rect = canvas.getBoundingClientRect();
+    const sizeFactor = this._renderer.sizeFactor;
+    return {
+      x: (e.clientX - rect.left) * sizeFactor,
+      y: (e.clientY - rect.top) * sizeFactor,
+    };
   }
 
   @bound
@@ -278,14 +297,31 @@ export class Roulette extends EventTarget {
 
   private attachEvent() {
     const canvas = this._renderer.canvas;
+    const endBoost = () => {
+      this.fastForwarder.setHolding(false);
+    };
+
     const onPointerRelease = (e: Event) => {
+      endBoost();
       this.mouseHandler('MouseUp', e as MouseEvent);
       window.removeEventListener('pointerup', onPointerRelease);
       window.removeEventListener('pointercancel', onPointerRelease);
     };
 
     canvas.addEventListener('pointerdown', (e: Event) => {
-      this.mouseHandler('MouseDown', e as MouseEvent);
+      const pe = e as PointerEvent;
+      const pos = this.canvasPosFromEvent(pe);
+      if (this._isRunning && pe.button === 0 && !this.isPosInMinimap(pos.x, pos.y)) {
+        this.fastForwarder.setHolding(true);
+        try {
+          canvas.setPointerCapture(pe.pointerId);
+        } catch {
+          /* ignore */
+        }
+      } else {
+        endBoost();
+      }
+      this.mouseHandler('MouseDown', pe);
       window.addEventListener('pointerup', onPointerRelease);
       window.addEventListener('pointercancel', onPointerRelease);
     });
@@ -342,6 +378,7 @@ export class Roulette extends EventTarget {
     this._winner = null;
     this._winners = [];
     this._isRunning = true;
+    this.fastForwarder.setRunning(true);
     this._winnerRank = options.winningRank;
     if (this._winnerRank >= this._marbles.length) {
       this._winnerRank = this._marbles.length - 1;
