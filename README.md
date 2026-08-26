@@ -79,11 +79,15 @@ MIT — see [LICENSE](./LICENSE).
 - Original work Copyright (c) 2023 LazyGyu  
 - Modifications Copyright (c) 2026 Open Marble contributors
 
-# 그리고 마지막 
-
-MIT 라이선스 해주신 lazygyu 감사 감사 ✨✨✨
-그리고 이 프로젝트는 [제 cursor](https://cursor.com/@34444) (광고 아님 내가 커서 같은 대기업과 광고 할 수 있었으면 지금 쯤 여기가 아니라 호캉스에 있었겠지😭😭😭) 과 4시간 만에 만들었습니다. ♥️♥️♥️♥️♥️♥️♥️
-
 # 약속
 
 절떄 이 프로젝트에 광고를 넣지 않겠습니다😭😭😭😭😭😭😭😭😭😭😭
+
+# 고양이 밈
+
+<img width="480" height="480" alt="CatMemeGIF" src="https://github.com/user-attachments/assets/4a6097fb-20db-44ff-b15f-8939be66c0db" />
+
+# 그리고 마지막 
+
+MIT 라이선스 해주신 lazygyu 감사 감사 ✨✨✨
+그리고 이 프로젝트는 [제 cursor](https://cursor.com/@34444) (광고 아님 내가 커서(cursor) 같은 대기업과 광고 할 수 있었으면 지금 쯤 여기가 아니라 호캉스에 있었겠지😭😭😭) 과 4시간 만에 만들었습니다. ♥️♥️♥️♥️♥️♥️♥️
