@@ -43,6 +43,7 @@ const KEYS = {
   lastNames: 'openmarble.lastNames',
   activeSettings: 'openmarble.activeSettingsId',
   activeMap: 'openmarble.activeMapId',
+  lastRandomTheme: 'openmarble.lastRandomThemeId',
 } as const;
 
 function loadArray<T>(key: string): T[] {
@@ -83,8 +84,7 @@ function builtin(
   id: string,
   title: string,
   darkMode: boolean,
-  palette: Partial<ThemeColors> & Pick<ThemeColors, 'background' | 'wall' | 'circle'>,
-  useSkills = true
+  palette: Partial<ThemeColors> & Pick<ThemeColors, 'background' | 'wall' | 'circle'>
 ): SettingsPreset {
   return {
     id: `builtin-${id}`,
@@ -92,7 +92,7 @@ function builtin(
     darkMode,
     winnerType: 'last',
     winningRank: 1,
-    useSkills,
+    useSkills: true,
     autoRecording: false,
     colors: colors(palette),
   };
@@ -101,8 +101,13 @@ function builtin(
 export const settingsPresets = {
   builtins(): SettingsPreset[] {
     return [
-      builtin('dark', '다크 (기본)', true, { background: '#000000', wall: '#00ffff', circle: '#ffff00', line: '#ffffff' }),
-      builtin('light', '라이트 (기본)', false, {
+      builtin('dark', '미드나잇', true, {
+        background: '#000000',
+        wall: '#00ffff',
+        circle: '#ffff00',
+        line: '#ffffff',
+      }),
+      builtin('light', '라이트', false, {
         background: '#eeeeee',
         wall: '#226f92',
         circle: '#ffcc00',
@@ -111,19 +116,47 @@ export const settingsPresets = {
         winnerBorder: '#000000',
         minimap: '#fefefe',
       }),
-      builtin('neon-pink', '마젠타 플레어', true, {
-        background: '#1a0022',
-        wall: '#e63bc0',
-        circle: '#1ad4e8',
-        line: '#f0b4dc',
-        skill: '#e63bc0',
+      builtin('amethyst', '자수정', true, {
+        background: '#14081f',
+        wall: '#9b59d0',
+        circle: '#f0c3ff',
+        line: '#d4b0f0',
+        skill: '#9b59d0',
       }),
-      builtin('ocean', '오션 블루', true, {
-        background: '#021526',
-        wall: '#3ec1d3',
-        circle: '#ff9a3c',
-        line: '#a0e9ff',
-        skill: '#3ec1d3',
+      builtin('matcha', '말차', true, {
+        background: '#12180f',
+        wall: '#7a9e4c',
+        circle: '#d4e07a',
+        line: '#c5d4a8',
+        skill: '#7a9e4c',
+      }),
+      builtin('ruby', '루비', true, {
+        background: '#160508',
+        wall: '#d62839',
+        circle: '#ff8a9a',
+        line: '#ffc2c8',
+        skill: '#d62839',
+      }),
+      builtin('grape', '포도', true, {
+        background: '#140c18',
+        wall: '#8e44ad',
+        circle: '#f8c8dc',
+        line: '#d7bde2',
+        skill: '#8e44ad',
+      }),
+      builtin('coral', '산호', true, {
+        background: '#1a0c0c',
+        wall: '#ff6f61',
+        circle: '#ffd1b3',
+        line: '#ffb09a',
+        skill: '#ff6f61',
+      }),
+      builtin('honey', '벌꿀', true, {
+        background: '#1a1204',
+        wall: '#f0b429',
+        circle: '#ffe08a',
+        line: '#ffecb3',
+        skill: '#f0b429',
       }),
       builtin('forest', '이끼 협곡', true, {
         background: '#07140e',
@@ -132,83 +165,20 @@ export const settingsPresets = {
         line: '#b4e8bc',
         skill: '#2bc47a',
       }),
-      builtin('sunset', '선셋', true, { background: '#1a0a08', wall: '#ff6b35', circle: '#ffd166', line: '#ffb4a2', skill: '#ff6b35' }),
-      builtin('lavender', '라벤더', true, { background: '#151022', wall: '#b388ff', circle: '#ff80ab', line: '#e1bee7', skill: '#b388ff' }),
-      builtin('mono', '모노크롬', true, { background: '#111111', wall: '#dddddd', circle: '#888888', line: '#ffffff', skill: '#ffffff' }, false),
-      builtin('candy', '캔디', false, {
-        background: '#fff5f8',
-        wall: '#ff6b9d',
-        circle: '#7bdff2',
-        line: '#5c4b51',
-        skill: '#ff6b9d',
-        winnerBorder: '#5c4b51',
-        minimap: '#ffe6ef',
+      builtin('ocean', '오션 블루', true, {
+        background: '#021526',
+        wall: '#3ec1d3',
+        circle: '#ff9a3c',
+        line: '#a0e9ff',
+        skill: '#3ec1d3',
       }),
-      builtin('retro', '레트로 그린', true, { background: '#001100', wall: '#33ff66', circle: '#ccff00', line: '#99ff99', skill: '#33ff66' }),
-      builtin('gold', '골드', true, { background: '#1a1408', wall: '#d4af37', circle: '#fff1a8', line: '#f5e6b8', skill: '#d4af37' }),
-      builtin('ice', '아이스', false, {
-        background: '#e8f4ff',
-        wall: '#4ea8de',
-        circle: '#48bfe3',
-        line: '#023e8a',
-        skill: '#0077b6',
-        winnerBorder: '#023e8a',
-        minimap: '#f0f8ff',
+      builtin('neon-pink', '마젠타 플레어', true, {
+        background: '#1a0022',
+        wall: '#e63bc0',
+        circle: '#1ad4e8',
+        line: '#f0b4dc',
+        skill: '#e63bc0',
       }),
-      builtin('clean-neon', '클린 네온', true, { background: '#000000', wall: '#00e5ff', circle: '#ffea00', line: '#ffffff' }),
-      builtin('soft', '소프트 베이지', false, {
-        background: '#f3efe6',
-        wall: '#8d6e63',
-        circle: '#ef9a9a',
-        line: '#5d4037',
-        skill: '#a1887f',
-        winnerBorder: '#5d4037',
-        minimap: '#faf6f0',
-      }),
-      builtin('amethyst', '자수정', true, { background: '#14081f', wall: '#9b59d0', circle: '#f0c3ff', line: '#d4b0f0', skill: '#9b59d0' }),
-      builtin('sahara', '사막', true, { background: '#1c1408', wall: '#e0a54d', circle: '#ffd89a', line: '#f5deb0', skill: '#e0a54d' }),
-      builtin('sakura', '벚꽃', false, {
-        background: '#fff0f4',
-        wall: '#d98aa6',
-        circle: '#ffc2d4',
-        line: '#6b3a4a',
-        skill: '#c96b88',
-        winnerBorder: '#6b3a4a',
-        minimap: '#fff7f9',
-      }),
-      builtin('grid', '그리드', true, { background: '#080814', wall: '#6e5cff', circle: '#ff4ec8', line: '#c8b8ff', skill: '#6e5cff' }),
-      builtin('honey', '벌꿀', true, { background: '#1a1204', wall: '#f0b429', circle: '#ffe08a', line: '#ffecb3', skill: '#f0b429' }),
-      builtin('coral', '산호', true, { background: '#1a0c0c', wall: '#ff6f61', circle: '#ffd1b3', line: '#ffb09a', skill: '#ff6f61' }),
-      builtin('graphite', '흑연', true, { background: '#1b1d20', wall: '#8a9199', circle: '#c5ccd3', line: '#e8eaed', skill: '#8a9199' }),
-      builtin('matcha', '말차', true, { background: '#12180f', wall: '#7a9e4c', circle: '#d4e07a', line: '#c5d4a8', skill: '#7a9e4c' }),
-      builtin('ruby', '루비', true, { background: '#160508', wall: '#d62839', circle: '#ff8a9a', line: '#ffc2c8', skill: '#d62839' }),
-      builtin('aurora', '오로라', true, { background: '#071018', wall: '#40e0c0', circle: '#c084fc', line: '#a8f0e0', skill: '#40e0c0' }),
-      builtin('navy', '남색', true, { background: '#0a1220', wall: '#3d6bb3', circle: '#f2c14e', line: '#9bb8e8', skill: '#3d6bb3' }),
-      builtin('peach', '복숭아', false, {
-        background: '#fff3ea',
-        wall: '#e07a5f',
-        circle: '#f4a261',
-        line: '#6d3b2a',
-        skill: '#e07a5f',
-        winnerBorder: '#6d3b2a',
-        minimap: '#fff8f2',
-      }),
-      builtin('lava', '용암', true, { background: '#120606', wall: '#ff3d00', circle: '#ffc107', line: '#ffab91', skill: '#ff3d00' }),
-      builtin('soda', '소다', false, {
-        background: '#e8fbff',
-        wall: '#2ec4b6',
-        circle: '#ff6b6b',
-        line: '#1a535c',
-        skill: '#2ec4b6',
-        winnerBorder: '#1a535c',
-        minimap: '#f3feff',
-      }),
-      builtin('steel', '강철', true, { background: '#12151a', wall: '#6b8aa3', circle: '#d0d7de', line: '#b8c5d0', skill: '#6b8aa3' }),
-      builtin('maple', '단풍', true, { background: '#160c08', wall: '#d35400', circle: '#f1c40f', line: '#f5cba7', skill: '#d35400' }),
-      builtin('grape', '포도', true, { background: '#140c18', wall: '#8e44ad', circle: '#f8c8dc', line: '#d7bde2', skill: '#8e44ad' }),
-      builtin('teal', '청록', true, { background: '#061416', wall: '#1abc9c', circle: '#f39c12', line: '#a3e4d7', skill: '#1abc9c' }),
-      builtin('study', '서재', true, { background: '#1a1410', wall: '#a67c52', circle: '#e8c39e', line: '#d4c4b0', skill: '#a67c52' }),
-      builtin('moonlight', '달빛', true, { background: '#0d1118', wall: '#a8c0d8', circle: '#f0f4f8', line: '#dce6f0', skill: '#a8c0d8' }),
     ];
   },
   list(): SettingsPreset[] {
@@ -298,5 +268,11 @@ export const session = {
   setActiveMapId(id: string | null) {
     if (id == null) localStorage.removeItem(KEYS.activeMap);
     else localStorage.setItem(KEYS.activeMap, id);
+  },
+  getLastRandomThemeId(): string | null {
+    return localStorage.getItem(KEYS.lastRandomTheme);
+  },
+  setLastRandomThemeId(id: string) {
+    localStorage.setItem(KEYS.lastRandomTheme, id);
   },
 };

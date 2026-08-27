@@ -237,23 +237,41 @@ function currentSettingsSnapshot(options: Options): Omit<SettingsPreset, 'id' | 
   };
 }
 
-function applySettings(roulette: Roulette, options: Options, preset: SettingsPreset) {
-  winnerType = preset.winnerType;
-  // 녹화·스킬은 프리셋과 무관 — 사용자가 직접 켠 값 유지
+function applyThemeLook(roulette: Roulette, options: Options, preset: SettingsPreset) {
   options.darkMode = preset.darkMode;
   document.documentElement.classList.toggle('light', !preset.darkMode);
   writeColorsToUI(preset.colors);
   applyColorsToTheme(roulette, preset.darkMode, preset.colors);
-  if (preset.winnerType === 'last') {
-    setWinnerRank(roulette, options, Math.max(1, roulette.getCount() || 1));
-  } else if (preset.winnerType === 'first') {
-    setWinnerRank(roulette, options, 1);
-  } else {
-    setWinnerRank(roulette, options, preset.winningRank);
-  }
-  session.setActiveSettingsId(preset.id);
+}
+
+const RANDOM_THEME_ID = 'builtin-random';
+
+function pickRandomTheme(): SettingsPreset {
+  const lastId = session.getLastRandomThemeId();
+  const pool = settingsPresets.builtins().filter((p) => p.id !== 'builtin-light' && p.id !== lastId);
+  const fallback = settingsPresets.builtins().filter((p) => p.id !== 'builtin-light');
+  const choices = pool.length > 0 ? pool : fallback;
+  const picked = choices[Math.floor(Math.random() * choices.length)] ?? settingsPresets.builtins()[0];
+  session.setLastRandomThemeId(picked.id);
+  return picked;
+}
+
+function selectThemeId(id: string) {
   const select = $('#sltSettingsPreset') as HTMLSelectElement | null;
-  if (select) select.value = preset.id;
+  if (select) select.value = id;
+}
+
+function applyRandomTheme(roulette: Roulette, options: Options) {
+  applyThemeLook(roulette, options, pickRandomTheme());
+  session.setActiveSettingsId(RANDOM_THEME_ID);
+  selectThemeId(RANDOM_THEME_ID);
+}
+
+function applySettings(roulette: Roulette, options: Options, preset: SettingsPreset) {
+  // 테마는 색·명암만 적용. 우승 조건·녹화·스킬은 사용자가 직접 켠 값 유지
+  applyThemeLook(roulette, options, preset);
+  session.setActiveSettingsId(preset.id);
+  selectThemeId(preset.id);
 }
 
 function fillSettingsSelector(selectedId?: string) {
@@ -261,6 +279,10 @@ function fillSettingsSelector(selectedId?: string) {
   if (!select) return;
   const current = selectedId ?? select.value;
   select.innerHTML = '';
+  const randomOpt = document.createElement('option');
+  randomOpt.value = RANDOM_THEME_ID;
+  randomOpt.textContent = '랜덤';
+  select.appendChild(randomOpt);
   settingsPresets.list().forEach((preset) => {
     const opt = document.createElement('option');
     opt.value = preset.id;
@@ -314,10 +336,15 @@ function bindSettingsPresetControls(roulette: Roulette, options: Options) {
   fillSettingsSelector();
   $('#sltSettingsPreset')?.addEventListener('change', () => {
     const id = ($('#sltSettingsPreset') as HTMLSelectElement).value;
+    if (id === RANDOM_THEME_ID) {
+      applyRandomTheme(roulette, options);
+      toast('테마: 랜덤');
+      return;
+    }
     const preset = settingsPresets.get(id);
     if (preset) {
       applySettings(roulette, options, preset);
-      toast(`설정: ${preset.title}`);
+      toast(`테마: ${preset.title}`);
     }
   });
 
@@ -356,7 +383,7 @@ function bindSettingsPresetControls(roulette: Roulette, options: Options) {
       fillSettingsSelector();
       const first = settingsPresets.list()[0];
       if (first) applySettings(roulette, options, first);
-      toast('설정 프리셋 삭제됨');
+      toast('테마 프리셋 삭제됨');
     });
   }
 }
@@ -382,12 +409,14 @@ function bindColorInputs(roulette: Roulette, options: Options) {
 
 function restoreActiveSettings(roulette: Roulette, options: Options) {
   const activeSettingsId = session.getActiveSettingsId();
+  if (!activeSettingsId || activeSettingsId === RANDOM_THEME_ID) {
+    applyRandomTheme(roulette, options);
+    return;
+  }
   const settingsList = settingsPresets.list();
-  const active =
-    settingsList.find((p) => p.id === activeSettingsId) ??
-    settingsList.find((p) => p.id === 'builtin-dark') ??
-    settingsList[0];
+  const active = settingsList.find((p) => p.id === activeSettingsId);
   if (active) applySettings(roulette, options, active);
+  else applyRandomTheme(roulette, options);
 }
 
 function bindSettingsIslandResize() {
@@ -501,6 +530,9 @@ function initMain(roulette: Roulette, options: Options) {
     ready = false;
     // Winner 유지. 조작 창을 다시 열 때(클릭/키) 구슬 초기화.
     const revealSettings = () => {
+      if (session.getActiveSettingsId() === RANDOM_THEME_ID) {
+        applyRandomTheme(roulette, options);
+      }
       getReady(roulette);
       $('#settings')?.classList.remove('hide');
       window.removeEventListener('pointerdown', revealSettings, true);
@@ -571,11 +603,6 @@ function initMain(roulette: Roulette, options: Options) {
   }
 
   restoreActiveSettings(roulette, options);
-  // Ensure default feel is 마지막 if no stored preference beyond builtins
-  if (!session.getActiveSettingsId()) {
-    winnerType = 'last';
-    setWinnerRank(roulette, options, Math.max(1, roulette.getCount() || 1));
-  }
 
   bindSettingsIslandResize();
   getReady(roulette);
