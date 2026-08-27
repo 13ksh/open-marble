@@ -37,20 +37,6 @@
 | 라이선스 | MIT — Copyright (c) 2023 LazyGyu |
 | 내 저장소에 있는 원본 내용.zip | https://github.com/13ksh/open-marble/blob/open-marble/roulette-main(github-lazygyu-roulette-pull-67)%20%EB%B0%B1%EC%97%85%EB%B3%B8.zip |
 
-원본만 보고 싶을 때:
-
-```shell
-git fetch upstream
-git checkout upstream-original
-```
-
-Open Marble 작업 브랜치로 돌아올 때:
-
-```shell
-git checkout open-marble
-# 또는 main
-```
-
 ## 원본 대비 변경 요약
 
 - 광고 / 샵 API / Analytics 제거
@@ -58,21 +44,6 @@ git checkout open-marble
 - 한국어 UI, 설정 패널 재구성
 - Shuffle 제거 → 이름 입력 시 자동 배치
 - 완전 정적 (백엔드 없음). 로컬 및 GitHub Pages 배포 가능
-
-## Development
-
-```shell
-npm install
-npm run dev
-```
-
-Open http://localhost:1235
-
-## Build
-
-```shell
-npm run build
-```
 
 ## License
 
