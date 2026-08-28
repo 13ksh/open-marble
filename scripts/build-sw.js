@@ -15,7 +15,7 @@
 // 이 파일은 최소 1년(2027-08까지) 유지해야 한다. 404가 되면 회수 경로가 끊긴다.
 
 const assert = require('node:assert');
-const { readFileSync, writeFileSync } = require('node:fs');
+const { readFileSync, writeFileSync, copyFileSync, mkdirSync } = require('node:fs');
 
 // 캐시 이름을 필터링하는 이유: github.io는 origin을 다른 프로젝트 페이지와
 // 공유한다. caches.keys()를 전부 지우면 남의 프로젝트 캐시까지 지운다.
@@ -55,6 +55,14 @@ self.addEventListener('activate', (event) => {
 `;
 
 writeFileSync('dist/service-worker.js', killSwitch);
+
+for (const file of ['robots.txt', 'sitemap.xml']) {
+  copyFileSync(file, `dist/${file}`);
+}
+
+mkdirSync('dist/assets', { recursive: true });
+copyFileSync('assets/og-image.png', 'dist/og-image.png');
+copyFileSync('assets/og-image.png', 'dist/assets/og-image.png');
 
 // src/index.ts가 번들 파일명의 content hash를 버전으로 읽는다. 파일명 규칙이나
 // script 태그 구조가 바뀌면 조용히 'dev'로 떨어지므로 산출물로 확인한다.

@@ -34,15 +34,36 @@ canvas {
 }
 
 div.copyright {
+  position: static;
+  transform: none;
+  color: var(--copyright-color);
+  font-size: 12px;
+  z-index: 999;
+  width: 100%;
+  text-align: center;
+}
+
+footer.site-footer {
   position: fixed;
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
-  color: var(--copyright-color);
-  font-size: 12px;
   z-index: 999;
   width: 90%;
   text-align: center;
+  pointer-events: none;
+}
+
+footer.site-footer a {
+  pointer-events: auto;
+}
+
+p.site-intro {
+  margin: 0 0 2px;
+  color: var(--copyright-color);
+  font-size: 11px;
+  opacity: 0.85;
+  line-height: 1.35;
 }
 
 div.copyright a {

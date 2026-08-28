@@ -374,6 +374,16 @@
   dependencies:
     "@parcel/plugin" "2.16.4"
 
+"@parcel/packager-xml@^2.16.4":
+  version "2.16.4"
+  resolved "https://registry.npmjs.org/@parcel/packager-xml/-/packager-xml-2.16.4.tgz"
+  integrity sha512-UbAonYLQEHWJWco/rtRq6Nzxvc0xSooLOwRydPqrLug2Up/byHxIF2ebQAnuXRZTgLn0dgmbzeGp6sWmnCRwnw==
+  dependencies:
+    "@parcel/plugin" "2.16.4"
+    "@parcel/types" "2.16.4"
+    "@parcel/utils" "2.16.4"
+    "@xmldom/xmldom" "^0.9.8"
+
 "@parcel/plugin@2.16.4":
   version "2.16.4"
   resolved "https://registry.npmjs.org/@parcel/plugin/-/plugin-2.16.4.tgz"
@@ -564,6 +574,15 @@
     "@parcel/plugin" "2.16.4"
     json5 "^2.2.3"
 
+"@parcel/transformer-jsonld@^2.16.4":
+  version "2.16.4"
+  resolved "https://registry.npmjs.org/@parcel/transformer-jsonld/-/transformer-jsonld-2.16.4.tgz"
+  integrity sha512-M8e8YFqaSFPgwhS3eepU11qAppnjx9VQaBrghXY6EYt31fTIY3N77y8tqbTe3/4pJrTI79SbakR6Z1skegET+Q==
+  dependencies:
+    "@parcel/plugin" "2.16.4"
+    "@parcel/types" "2.16.4"
+    json5 "^2.2.3"
+
 "@parcel/transformer-node@2.16.4":
   version "2.16.4"
   resolved "https://registry.npmjs.org/@parcel/transformer-node/-/transformer-node-2.16.4.tgz"
@@ -637,6 +656,14 @@
     "@parcel/diagnostic" "2.16.4"
     "@parcel/plugin" "2.16.4"
     "@parcel/utils" "2.16.4"
+
+"@parcel/transformer-xml@^2.16.4":
+  version "2.16.4"
+  resolved "https://registry.npmjs.org/@parcel/transformer-xml/-/transformer-xml-2.16.4.tgz"
+  integrity sha512-dec3Un8wKco66ZRVnG4PueihWmDUjHTVh8KtNIcAJiU86rlilEFUvDitu2TAJ4/bktJJHuuCDU2xSjxVPJLiDA==
+  dependencies:
+    "@parcel/plugin" "2.16.4"
+    "@xmldom/xmldom" "^0.9.8"
 
 "@parcel/types-internal@2.16.4":
   version "2.16.4"
@@ -758,6 +785,11 @@
   version "1.39.11"
   resolved "https://registry.npmjs.org/@types/emscripten/-/emscripten-1.39.11.tgz"
   integrity sha512-dOeX2BeNA7j6BTEqJQL3ut0bRCfsyQMd5i4FT8JfHfYhAOuJPCGh0dQFbxVJxUyQ+75x6enhDdndGb624/QszA==
+
+"@xmldom/xmldom@^0.9.8":
+  version "0.9.12"
+  resolved "https://registry.npmjs.org/@xmldom/xmldom/-/xmldom-0.9.12.tgz"
+  integrity sha512-5AXjrcMClTryPe9LgZrygpB1lj7s0S9E0+W+AHaVKAVyHanafK86iPSvG5xHVSp/jC+VH1UXu0TAEmY279xH7A==
 
 ansi-styles@^4.1.0:
   version "4.3.0"

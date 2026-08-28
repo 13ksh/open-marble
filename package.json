@@ -5,8 +5,11 @@
   "devDependencies": {
     "@biomejs/biome": "2.4.4",
     "@parcel/packager-raw-url": "^2.16.4",
+    "@parcel/packager-xml": "^2.16.4",
+    "@parcel/transformer-jsonld": "^2.16.4",
     "@parcel/transformer-sass": "^2.16.4",
     "@parcel/transformer-webmanifest": "^2.16.4",
+    "@parcel/transformer-xml": "^2.16.4",
     "parcel": "^2.16.4",
     "typescript": "^5.6.3"
   },
